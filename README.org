@@ -4,7 +4,7 @@
 #+OPTIONS: toc:2
 
 * 概要
-このプロジェクトは、go-wasm-p2p-chatのZig + Svelte実装です。ブラウザ間でWebRTCを使用したP2Pチャットアプリケーションを構築します。
+このプロジェクトは、Zig + Svelteの学習として、ブラウザ間でWebRTCを使用したP2Pチャットアプリケーションを構築します。
 
 ** 主な特徴
 - Zig (WebAssembly) によるコアロジック実装
