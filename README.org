@@ -1,0 +1,93 @@
+#+TITLE: Zig + Svelte P2P Chat Application
+#+AUTHOR: wtnqk
+#+DATE: 2025-08-17
+#+OPTIONS: toc:2
+
+* 概要
+このプロジェクトは、go-wasm-p2p-chatのZig + Svelte実装です。ブラウザ間でWebRTCを使用したP2Pチャットアプリケーションを構築します。
+
+** 主な特徴
+- Zig (WebAssembly) によるコアロジック実装
+- Svelteによるリアクティブなフロントエンド
+- WebRTCを使用したブラウザ間P2P通信
+- マッチメイキングサーバーによるランダムマッチング
+- サーバーレスなメッセージ配信（P2P直接通信）
+
+* アーキテクチャ設計
+
+** システム全体構成
+#+BEGIN_SRC
+┌─────────────┐        ┌──────────────────┐        ┌─────────────┐
+│  Browser A  │        │  Backend Servers │        │  Browser B  │
+├─────────────┤        ├──────────────────┤        ├─────────────┤
+│   Svelte    │        │  Matchmaking     │        │   Svelte    │
+│     UI      │◄──────►│    Server        │◄──────►│     UI      │
+├─────────────┤        ├──────────────────┤        ├─────────────┤
+│ Zig WASM    │        │   Signaling      │        │ Zig WASM    │
+│   Core      │◄──────►│    Server        │◄──────►│   Core      │
+└─────────────┘        └──────────────────┘        └─────────────┘
+       ▲                                                    ▲
+       └────────────── WebRTC P2P Connection ──────────────┘
+#+END_SRC
+
+** モジュール構成
+
+*** Zig WebAssembly Core (`/zig-core`)
+- =src/main.zig= - WebAssemblyエントリーポイント
+- =src/webrtc/= - WebRTC接続管理
+  - =connection.zig= - ピア接続ロジック
+  - =signaling.zig= - シグナリングプロトコル
+  - =data_channel.zig= - データチャネル管理
+- =src/matchmaking/= - マッチメイキングクライアント
+  - =client.zig= - WebSocketクライアント
+  - =protocol.zig= - マッチメイキングプロトコル
+- =src/crypto/= - 暗号化とユーザーID生成
+- =src/bindings/= - JavaScript バインディング
+
+*** Svelte Frontend (`/svelte-app`)
+- =src/App.svelte= - メインアプリケーションコンポーネント
+- =src/components/=
+  - =Chat.svelte= - チャット画面
+  - =MessageList.svelte= - メッセージ一覧
+  - =MessageInput.svelte= - メッセージ入力
+  - =ConnectionStatus.svelte= - 接続状態表示
+- =src/stores/= - Svelteストア
+  - =connection.js= - 接続状態管理
+  - =messages.js= - メッセージ履歴
+  - =user.js= - ユーザー情報
+- =src/lib/= - ユーティリティ
+  - =wasm-loader.js= - WebAssemblyロード
+  - =api.js= - Zig関数のラッパー
+
+* 技術スタック
+
+** フロントエンド
+- *Svelte*: リアクティブUIフレームワーク
+- *Bun*: 高速なJavaScriptランタイム・ビルドツール
+- *TypeScript*: 型安全性
+- *Tailwind CSS*: ユーティリティファーストCSS
+
+** バックエンド (WebAssembly)
+- *Zig*: システムプログラミング言語
+- *Zig標準ライブラリ*: WebAssemblyサポート内蔵
+- *JavaScript相互運用*: Zigの組み込みJS連携機能
+- *zig build*: WebAssemblyビルドシステム
+
+** WebRTC関連
+- *WebRTC JavaScript API*: ブラウザAPIの直接呼び出し
+- *Zigの非同期*: async/awaitサポート
+- *イベントループ統合*: JavaScript Promise連携
+
+** 開発ツール
+- *Zig*: ビルドシステム統合
+- *Bun*: パッケージマネージャー機能も統合
+- *Vite*: 開発サーバーとホットリロード
+
+
+* 参考資料
+
+** ドキュメント
+- [[https://ziglang.org/documentation/][Zig Language Reference]]
+- [[https://svelte.dev/docs][Svelte Documentation]]
+- [[https://webrtc.org/][WebRTC.org]]
+- [[https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API][MDN WebRTC API]]
